@@ -1,0 +1,29 @@
+name: Build Policy PDF
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Install pandoc and LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends pandoc texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra
+
+      - name: Convert policy.md to PDF
+        run: pandoc policy.md -o policy.pdf -V geometry:margin=1in
+
+      - name: Create release with PDF
+        uses: softprops/action-gh-release@v2
+        with:
+          files: policy.pdf
